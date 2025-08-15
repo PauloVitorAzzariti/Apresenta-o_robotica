@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Curso de Robótica • Escola Viva</title>
+<style>
+:root{
+  --bg1:#0f172a; --bg2:#071021;
+  --accent1:#ff4da6; --accent2:#00b8d4; --accent3:#ffd166;
+  --card:#ffffff; --muted:#94a3b8;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;}
+body{background: linear-gradient(160deg,var(--bg1),var(--bg2)); color:var(--card); overflow:hidden;}
+
+/* Stage & slides */
+.app{position:relative;height:100vh;display:flex;align-items:center;justify-content:center;padding:40px;}
+.deck{width:100%;max-width:1200px;height:80vh;overflow:hidden;border-radius:20px;box-shadow:0 20px 60px rgba(2,6,23,0.6);background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));position:relative;}
+.slide{position:absolute;inset:0;padding:48px;display:grid;grid-template-rows:auto 1fr auto;gap:12px;opacity:0;transform:translateX(30px) scale(.98);transition:all .6s cubic-bezier(.2,.9,.2,1);}
+.slide.active{opacity:1;transform:translateX(0) scale(1);}
+
+/* header */
+.header{display:flex;align-items:center;gap:16px;justify-content:space-between;}
+.logo{height:64px;width:auto;filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5));}
+.title{font-weight:800;font-size:clamp(20px,2.4vw,30px);letter-spacing:0.4px}
+
+/* hero */
+.hero{display:flex;gap:24px;align-items:center}
+.hero .left{flex:1}
+.hero h1{margin:0;font-size:clamp(28px,4.8vw,56px);line-height:1.02;letter-spacing:-1px}
+.hero p{margin:8px 0 0;color:var(--muted);font-weight:600}
+.badges{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+.badge{background:linear-gradient(90deg,var(--accent1),var(--accent2));padding:8px 12px;border-radius:999px;font-weight:700;box-shadow:0 8px 20px rgba(0,0,0,0.35);}
+
+/* content areas */
+.content{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:start}
+.card{background:rgba(255,255,255,0.03);border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.04);}
+.qbox li{margin:12px 0;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));cursor:pointer;transition:transform .18s ease, box-shadow .18s}
+.qbox li:hover{transform:translateY(-6px);box-shadow:0 14px 30px rgba(2,6,23,0.5);}
+.hidden{display:none}
+
+/* scratch sample */
+.scratch-sample{display:flex;flex-direction:column;gap:10px;align-items:center}
+.scratch-img{width:100%;max-width:360px;border-radius:12px;box-shadow:0 12px 30px rgba(2,6,23,0.6)}
+
+/* footer controls */
+.controls{position:absolute;right:20px;bottom:20px;display:flex;gap:8px;align-items:center}
+.btn{background:linear-gradient(90deg,var(--accent2),var(--accent1));border:none;padding:10px 14px;border-radius:12px;color:#021024;font-weight:800;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.45)}
+.page-dots{display:flex;gap:8px;align-items:center}
+.dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.12);cursor:pointer}
+.dot.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));transform:scale(1.4)}
+
+/* confetti canvas */
+canvas.confetti{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen}
+
+/* responsive */
+@media (max-width:980px){.content{grid-template-columns:1fr}.hero{flex-direction:column;align-items:center;text-align:center}.controls{left:50%;transform:translateX(-50%);right:auto} .logo{height:56px}}
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="Apresentação Robótica Escola Viva">
+
+  <div class="deck" id="deck">
+    <!-- Slide 1 - Hero / Boas-vindas -->
+    <section class="slide active" data-title="Boas-vindas">
+      <div class="header">
+        <img src="img/Logo.png" class="logo" alt="Escola Viva">
+        <div class="title">Curso de Robótica — 1º e 2º Ano • Escola Viva</div>
+      </div>
+
+      <div class="hero" style="margin-top:8px">
+        <div class="left">
+          <h1>Bem-vindos à turma de <span style="background:linear-gradient(90deg,var(--accent1),var(--accent2));-webkit-background-clip:text;color:transparent">Robótica</span>!</h1>
+          <p>Uma jornada divertida cheia de projetos, descobertas e criatividade. Hoje vamos conhecer o que é robótica e como vamos aprender programando com blocos no Scratch.</p>
+          <div class="badges" aria-hidden="true">
+            <div class="badge">Aprender 🛠️</div>
+            <div class="badge">Criar 🎨</div>
+            <div class="badge">Brincar 🤖</div>
+          </div>
+        </div>
+        <div class="right card" style="width:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+          <img src="img/Logo.png" alt="Logo Escola Viva" style="max-width:200px;border-radius:12px;background:#fff;padding:6px">
+          <div style="color:var(--muted);text-align:center">Professor:Paulo Vitor e André Perez<strong>__</strong><br>Turma: <strong>1º e 2º Ano</strong></div>
+          <div style="font-size:14px;color:var(--muted)">Duração das aulas: 45 min • Materiais incluídos</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px">
+        <div style="color:var(--muted)">Interaja: toque nas perguntas e responda em voz alta ✨</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn" onclick="startConfetti()">🎉 Surprise</button>
+          <div style="width:6px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 2 - Perguntas -->
+    <section class="slide" data-title="Perguntas">
+      <div class="header">
+        <img src="img/Logo.png" class="logo" alt="Escola Viva">
+        <div class="title">Vamos pensar juntos</div>
+      </div>
+
+      <div class="content" style="margin-top:8px">
+        <div class="card qcard">
+          <h2>Você já viu um robô?</h2>
+          <p class="lead" style="color:var(--muted)">Toque em uma pergunta para ver sugestões ou responder com a turma.</p>
+          <ul class="qbox" id="qbox">
+            <li data-answer="yes">o que é um robô — onde?</li>
+            <li data-answer="what">O que um robô pode fazer?</li>
+            <li data-answer="build">Para que serve um robô?</li>
+          </ul>
+        </div>
+
+        <div class="card" id="answerCard" aria-live="polite">
+          <h3>Respostas e ideias</h3>
+          <div id="answerText" style="color:var(--muted)">Toque em uma pergunta à esquerda para ver ideias e exemplos divertidos!</div>
+          <div style="margin-top:12px">
+            <button class="btn" onclick="nextSlide()">Continuar ➜</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3 - Conceito -->
+    <section class="slide" data-title="Conceito">
+      <div class="header">
+        <img src="img/Logo.png" class="logo" alt="Escola Viva">
+        <div class="title">O que é Robótica?</div>
+      </div>
+
+      <div style="padding-top:12px">
+        <div class="content">
+          <div class="card">
+            <h2>Conceito simples</h2>
+            <p style="color:var(--muted)">Robótica é juntar peças (como blocos), motores e sensores com um pouco de programação para criar algo que se mexe e resolve desafios.</p>
+            <ol style="color:var(--muted)">
+              <li><strong>Montar:</strong> unimos peças para criar um corpo.</li>
+              <li><strong>Mover:</strong> adicionamos motores e rodas.</li>
+              <li><strong>Programar:</strong> contamos passos para o robô seguir.</li>
+            </ol>
+          </div>
+
+          <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <h3>Mini-atividade</h3>
+            <p style="color:var(--muted)">Formem duplas: desenhem o robô dos sonhos e expliquem o que ele faria!</p>
+            <button class="btn" onclick="showIdea()">Mostrar exemplo</button>
+            <div id="idea" class="hidden" style="margin-top:12px;color:var(--muted)"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4 - Programação Scratch -->
+    <section class="slide" data-title="Scratch">
+      <div class="header">
+        <img src="img/Logo.png" class="logo" alt="Escola Viva">
+        <div class="title">Programando com Scratch</div>
+      </div>
+
+      <div style="padding-top:12px">
+        <div class="content">
+          <div class="card">
+            <h2>O que é o Scratch?</h2>
+            <p style="color:var(--muted)">Uma ferramenta colorida que usa blocos para programar personagens. É fácil de aprender e muito divertida!</p>
+            <ul style="color:var(--muted)">
+              <li>Arrastar blocos</li>
+              <li>Montar sequências</li>
+              <li>Testar e melhorar</li>
+            </ul>
+            <p style="color:var(--muted)"><em>Exemplo:</em> 'quando clicar na bandeira verde' → 'andar 10 passos' → 'girar 15°'</p>
+          </div>
+
+          <div class="card scratch-sample" style="align-items:center">
+            <img class="scratch-img" src="img/scratch-dashboard.png" alt="Scratch">
+            <div style="color:var(--muted);font-weight:700">Atividade: Vamos montar um personagem que anda e fala!</div>
+            <button class="btn" onclick="openScratch()">Abrir Scratch</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5 - Materiais e Encerramento -->
+    <section class="slide" data-title="Fim">
+      <div class="header">
+        <img src="img/Logo.png" class="logo" alt="Escola Viva">
+        <div class="title">Materiais & Próximos passos</div>
+      </div>
+
+      <div style="padding-top:12px">
+        <div class="content">
+          <div class="card">
+            <h2>Materiais fornecidos</h2>
+            <ul style="color:var(--muted)">
+              <li>Kits de peças e motores</li>
+              <li>Tablets com Scratch</li>
+              <li>Fichas de atividades</li>
+            </ul>
+            <p style="color:var(--muted)">Regras rápidas: Respeito, cuidado com as peças e muita curiosidade!</p>
+          </div>
+
+          <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <h3>Pronto para começar?</h3>
+            <p style="color:var(--muted)">Quando eu disser 'já', formem os grupos e vamos montar o primeiro robô.</p>
+            <button class="btn" onclick="celebrate()">Já!</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <canvas class="confetti" id="confetti"></canvas>
+  </div>
+
+  <div class="controls" role="navigation" aria-label="Controles de slides">
+    <div style="display:flex;align-items:center;margin-right:12px">
+      <button class="btn" onclick="prevSlide()">◀</button>
+      <button class="btn" onclick="nextSlide()">▶</button>
+    </div>
+    <div class="page-dots" id="dots"></div>
+  </div>
+
+</div>
+
+<script>
+// Slide management
+const slides = Array.from(document.querySelectorAll('.slide'));
+let idx = 0;
+const dots = document.getElementById('dots');
+
+function updateSlides(){
+  slides.forEach((s,i)=> s.classList.toggle('active', i===idx));
+  // update dots
+  dots.innerHTML = '';
+  slides.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===idx? ' active':'');
+    d.title = s.dataset.title || ('Slide ' + (i+1));
+    d.onclick = ()=>{ idx = i; updateSlides(); };
+    dots.appendChild(d);
+  });
+}
+
+function nextSlide(){ idx = Math.min(slides.length-1, idx+1); updateSlides(); }
+function prevSlide(){ idx = Math.max(0, idx-1); updateSlides(); }
+function startConfetti(){ runConfetti(60); }
+function celebrate(){ runConfetti(140); }
+
+updateSlides();
+
+// Q&A interactions
+document.getElementById('qbox').addEventListener('click', (e)=>{
+  const li = e.target.closest('li');
+  if(!li) return;
+  const a = li.dataset.answer;
+  const answerText = document.getElementById('answerText');
+  if(a==='yes') answerText.textContent = 'Já! Alguns robôs estão em fábricas, brinquedos e até em filmes. Eles ajudam em tarefas repetitivas e divertem!';
+  if(a==='what') answerText.textContent = 'Robôs podem empurrar coisas, falar, seguir linhas, detectar luz e muito mais — depende de como os programamos.';
+  if(a==='build') answerText.textContent = 'Sim! Vamos construir com peças, motores e dizer para o robô o que fazer usando blocos de programação.';
+  // small feedback animation
+  answerText.animate([{opacity:0, transform:'translateY(6px)'},{opacity:1, transform:'translateY(0)'}], {duration:420, easing:'cubic-bezier(.2,.9,.2,1)'});
+});
+
+// Idea reveal
+function showIdea(){
+  const el = document.getElementById('idea');
+  el.textContent = 'Exemplo: Robô Coletor de Lixo — ele anda, detecta objetos e guarda em um compartimento. Tem luzes e um som engraçado!';
+  el.classList.remove('hidden');
+  el.animate([{opacity:0},{opacity:1}],{duration:420});
+}
+
+// Scratch open
+function openScratch(){
+  window.open('https://scratch.mit.edu', '_blank');
+}
+
+// Keyboard & swipe
+window.addEventListener('keydown',(e)=>{
+  if(e.key==='ArrowRight') nextSlide();
+  if(e.key==='ArrowLeft') prevSlide();
+  if(e.key==='Home') { idx=0; updateSlides(); }
+  if(e.key==='End') { idx=slides.length-1; updateSlides(); }
+});
+
+let touchStartX=0, touchStartY=0;
+window.addEventListener('touchstart', e=>{ const t=e.changedTouches[0]; touchStartX=t.clientX; touchStartY=t.clientY; });
+window.addEventListener('touchend', e=>{ const t=e.changedTouches[0]; const dx=t.clientX-touchStartX, dy=t.clientY-touchStartY; if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)){ if(dx<0) nextSlide(); else prevSlide(); } });
+
+// Simple confetti (canvas) — lightweight
+function runConfetti(particles=80){
+  const c = document.getElementById('confetti');
+  const ctx = c.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  function resize(){ c.width = c.clientWidth * dpr; c.height = c.clientHeight * dpr; ctx.scale(dpr, dpr); }
+  resize(); window.addEventListener('resize', resize);
+  const colors = ['#ff4da6','#00b8d4','#ffd166','#8be04b','#7c4dff'];
+  let items = [];
+  for(let i=0;i<particles;i++){ items.push({
+    x: Math.random()*c.clientWidth, y: -20 - Math.random()*200,
+    vx: (Math.random()-0.5)*2, vy: 2+Math.random()*4,
+    r: 6+Math.random()*8, color: colors[Math.floor(Math.random()*colors.length)],
+    rot: Math.random()*360, rotSpeed:(Math.random()-0.5)*6
+  }); }
+  let t=0;
+  function frame(){
+    ctx.clearRect(0,0,c.clientWidth,c.clientHeight);
+    items.forEach(it=>{
+      it.x += it.vx; it.y += it.vy; it.rot += it.rotSpeed;
+      ctx.save();
+      ctx.translate(it.x, it.y);
+      ctx.rotate(it.rot*Math.PI/180);
+      ctx.fillStyle = it.color;
+      ctx.fillRect(-it.r/2, -it.r/2, it.r, it.r*0.6);
+      ctx.restore();
+    });
+    items = items.filter(it=> it.y < c.clientHeight + 40);
+    if(items.length>0){ requestAnimationFrame(frame); } else { ctx.clearRect(0,0,c.clientWidth,c.clientHeight); }
+  }
+  frame();
+}
+
+// Accessibility: reduce motion if requested
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  document.querySelectorAll('.slide').forEach(s=> s.style.transition='none');
+}
+
+</script>
+</body>
+</html>
